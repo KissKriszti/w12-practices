@@ -26,28 +26,51 @@ app.get('/api/v1/users', (req,res,next) => {
     res.sendFile(userFile);
 });
 
-app.get('/api/v1/users/active', (req,res,next) => {
-    fs.readFile(userFile, (error,data) => {
-        if (error) {
-            res.send("Something went wrong in reading the file")
-        }
-        else {
-            const users = JSON.parse(data)
-            res.send(users.filter(user => user.status === "active"))
-        }
-    })
-})
+app.get('/api/v1/users-query', (req,res,next) => {
+    console.log(req.query.apiKey)
+    if (req.query.apiKey === 'apple') {
+        res.sendFile(userFile);
+    }
+    else {
+        res.send('Unauthorized request')
+    }
+});
 
-app.get('/api/v1/users/passive', (req,res,next) => {
-    fs.readFile(userFile, (error,data) => {
-        if (error) {
-            res.send("Something went wrong in reading the file")
-        }
-        else {
-            const users = JSON.parse(data)
-            res.send(users.filter(user => user.status === "passive"))
-        }
-    })
+app.get('/api/v1/users-params/:key', (req,res,next) => {
+    console.dir(req.params)
+    console.log(req.params.key)
+    if (req.params.key === 'apple') {
+        res.send("You wrote apple")
+    }
+    else {
+        res.send("It's not an apple")
+
+    }
+});
+
+app.get('/api/v1/users/:status', (req,res,next) => {
+    if (req.params.status === "active") {
+        fs.readFile(userFile, (error,data) => {
+            if (error) {
+                res.send("Something went wrong in reading the file")
+            }
+            else {
+                const users = JSON.parse(data)
+                res.send(users.filter(user => user.status === "active"))
+            }
+        })
+    }
+    else {
+        fs.readFile(userFile, (error,data) => {
+            if (error) {
+                res.send("Something went wrong in reading the file")
+            }
+            else {
+                const users = JSON.parse(data)
+                res.send(users.filter(user => user.status === "passive"))
+            }
+        })
+    }
 })
 
 app.use('/public', express.static(`${__dirname}/../frontend/public`));
